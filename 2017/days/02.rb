@@ -1,27 +1,34 @@
-def parse(data)
-  data.strip!
-  data.split("\n").map { |row| row.split(/\s+/).map(&:to_i) }
-end
+require_relative './helper.rb'
 
-def checksum(raw_data)
-  data = parse(raw_data)
-  partial = data.map { |row| yield row }
-  partial.reduce(&:+) || 0
-end
+module Day02
+  def parse(data)
+    data.strip!
+    data.split("\n").map { |row| row.split(/\s+/).map(&:to_i) }
+  end
 
-def minmax(data)
-  checksum(data) { |row| row.max - row.min }
-end
+  def checksum(input)
+    data = input.dup
+    partial = data.map { |row| yield row }
+    partial.reduce(&:+) || 0
+  end
 
-def divisible(data)
-  checksum(data) do |row|
+  def minmax(row)
+    row.max - row.min
+  end
+
+  def divisible(row)
     result = 1
     row.each do |n|
       (row - [n]).each do |m|
         int, rem = n.divmod m
-        result = int if rem == 0
+        result = int if rem.zero?
       end
     end
     result
+  end
+
+  def solve
+    input = parse aoc('02')
+    [checksum(input, &method(:minmax)), checksum(input, &method(:divisible))]
   end
 end
